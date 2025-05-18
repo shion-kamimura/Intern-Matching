@@ -1,0 +1,8 @@
+.bg-white {
+  background-color: #ffffff;
+}
+
+.link-no-color {
+  color: inherit;
+  text-decoration: none;
+}

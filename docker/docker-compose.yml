@@ -24,7 +24,12 @@ services:
       - "3306:3306"
     networks:
       - fuelphp-network
+    volumes:
+      - db_data:/var/lib/mysql
 
 networks:
   fuelphp-network:
     driver: bridge
+
+volumes:
+  db_data:
