@@ -4,43 +4,37 @@ class Controller_Student extends Controller_Base
 {
     public function action_login()
     {
+        $data = [];
         if (Input::method() === 'POST') {
             $email = Input::post('email');
             $password = Input::post('password');
 
-            $user = DB::select()
-                ->from('users')
-                ->where('email', $email)
-                ->where('password', $password)
-                ->execute()
-                ->current();
+            $val = Validation::forge();
+            $val->add('email', 'Email')->add_rule('required')->add_rule('valid_email');
+            $val->add('password', 'Password')->add_rule('required');
 
-            if ($user) {
-                Session::set('user_id', $user['id']);
-                Session::set('user_name', $user['name']);
-                Response::redirect('student/list');
+            if($val->run()) {
+                $user = DB::select()
+                    ->from('users')
+                    ->where('email', $email)
+                    ->where('password', $password)
+                    ->execute()
+                    ->current();
+
+                if ($user && password_verify($password, $user['password'])) {
+                    Session::set('user_id', $user['id']);
+                    Session::set('user_name', $user['name']);
+                    Session::set('user_type', 'student');
+                    Response::redirect('student/list');
+                } else {
+                    $data['error'] = 'メールアドレスまたはパスワードが違います';
+                }
             } else {
-                $data['error'] = 'メールアドレスまたはパスワードが違います';
-            }
-        }    
-
-        return Response::forge(View::forge('student/login', isset($data) ? $data : []));
-    }
-
-    public function post_login()
-    {
-        $email = Input::post('email');
-        $password = Input::post('password');
-
-        $user = DB::select()->from('users')->where('email', '=', $email)->execute()->current();
-
-        if ($user && $user['password'] === $password) {
-            Session::set('user_id', $user['id']);
-            Response::redirect('/student/list');
-        } else {
-        
+                $data['error'] = '入力に誤りがあります。正しいメールアドレスとパスワードを入力してください。';
+            } 
         }
-    
+            
+        return Response::forge(View::forge('student/login', $data));
     }
 
     public function action_logout()
@@ -59,12 +53,27 @@ class Controller_Student extends Controller_Base
 
     public function post_register()
     {
+        $val = Validation::forge();
+        $val->add('name', '名前')->add_rule('required')->add_rule('max_length', 100);
+        $val->add('email', 'メールアドレス')->add_rule('required')->add_rule('valid_email');
+        $val->add('password', 'パスワード')->add_rule('required')->add_rule('min_length', 6);
+        $val->add('school', '学校')->add_rule('required')->add_rule('max_length', 100);
+        $val->add('grade', '学年')->add_rule('required');
+        $val->add('skills', 'スキル')->add_rule('required');
+
+        if (!$val->run()) {
+            $errors = $val->error();
+            return Response::forge(View::forge('student/register', ['errors' => $errors]));
+        }
+
         $name = Input::post('name');
         $email = Input::post('email');
         $password = Input::post('password');
         $school = Input::post('school');
         $grade = Input::post('grade');
         $skills = Input::post('skills');
+
+        $password_hashed = password_hash($password, PASSWORD_DEFAULT);
 
         DB::insert('users')->set([
             'name' => $name,
@@ -81,17 +90,6 @@ class Controller_Student extends Controller_Base
 
     public function action_list()
     {
-        /* $jobs = DB::select(
-            'jobs.id', 'jobs.title', 'jobs.description', 'jobs.period',
-            'jobs.salary', 'jobs.requirements', 'jobs.created_at',
-            'companies.name'
-            )
-            ->from('jobs')
-            ->join('companies', 'LEFT')
-            ->on('jobs.company_id', '=', 'companies.id')
-            ->order_by('jobs.created_at', 'desc')
-            ->execute()
-            ->as_array(); */
         return Response::forge(view::forge('student/list'));//, ['jobs' => $jobs]));
     }
 
@@ -154,8 +152,8 @@ class Controller_Student extends Controller_Base
         $data = json_decode(file_get_contents('php://input'), true);
 
         $user_id = Session::get('user_id');
-        $job_id = $data['job_id'];
-        $action = $data['action'];
+        $job_id = $data['job_id'] ?? null;
+        $action = $data['action'] ?? null;
         $liked = $action === 'like';
 
         if (!$user_id || !$job_id) {
@@ -163,14 +161,12 @@ class Controller_Student extends Controller_Base
         }
 
         if ($liked) {
-            // いいねを追加
             DB::insert('likes')->set([
                 'user_id' => $user_id,
                 'job_id' => $job_id,
                 'created_at' => date('Y-m-d H:i:s')
             ])->execute();
         } else {
-            // いいねを削除
             DB::delete('likes')
                 ->where('user_id', $user_id)
                 ->where('job_id', $job_id)

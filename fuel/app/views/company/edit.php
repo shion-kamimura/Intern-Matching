@@ -5,27 +5,27 @@
         <form method="post">
             <div class="mb-3">
                 <label class="form-label">タイトル</label>
-                <input type="text" name="title" class="form-control" value="<?= htmlspecialchars($job['title']) ?>">
+                <input type="text" name="title" class="form-control" value="<?php echo e($job['title']) ?>">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">説明</label>
-                <textarea name="description" class="form-control"><?= htmlspecialchars($job['description']) ?></textarea>
+                <textarea name="description" class="form-control"><?php echo e($job['description']) ?></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">期間</label>
-                <input type="text" name="period" class="form-control" value="<?= htmlspecialchars($job['period']) ?>">
+                <input type="text" name="period" class="form-control" value="<?php echo e($job['period']) ?>">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">給与</label>
-                <input type="text" name="salary" class="form-control" value="<?= htmlspecialchars($job['salary']) ?>">
+                <input type="text" name="salary" class="form-control" value="<?php echo e($job['salary']) ?>">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">応募条件</label>
-                <textarea name="requirements" class="form-control"><?= htmlspecialchars($job['requirements']) ?></textarea>
+                <textarea name="requirements" class="form-control"><?php echo e($job['requirements']) ?></textarea>
             </div>
 
             <button type="submit" class="btn btn-dark">更新</button>

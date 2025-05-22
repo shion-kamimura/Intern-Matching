@@ -13,7 +13,7 @@
             </div>
             <div class="mb-3">
                 <label for="period" class="form-label">期間</label>
-                <input type="period" class="form-control" id="period" name="period">
+                <input type="text" class="form-control" id="period" name="period">
             </div>
             <div class="mb-3">
                 <label for="salary" class="form-label">給与・報酬</label>

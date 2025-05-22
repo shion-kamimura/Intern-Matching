@@ -7,20 +7,25 @@
             <a href="/company/create" class="btn btn-dark mt-2">作成する</a>
         </div>
     </div>
+    <?php if (empty($jobs)): ?>
+        <div class="container">
+            <p class="text-muted">まだ求人が作成されていません。</p>
+        </div>
+    <?php endif; ?>
     <?php foreach ($jobs as $job): ?>
         <div class="container mb-5">
             <div class="card">
                 <h4 class="card-header bg-white">
-                    <?php echo $job['id'] ?>
+                    <?php echo e($job['id']) ?>
                 </h4>
                 <div class="card-body">
-                    <h5 class="card-title"><?php echo $job['title'] ?></h5>
-                    <p class="card-text my-0">仕事内容：<?php echo $job['description'] ?></p>
-                    <p class="card-text my-0">応募条件：<?php echo $job['requirements'] ?></p>
-                    <p class="card-text my-0">期間：<?php echo $job['period'] ?></p>
-                    <p class="card-text my-0">給与・報酬：<?php echo $job['salary'] ?></p>
-                    <a href="/company/applicants/<?php echo $job['id']; ?>" class="btn btn-light mt-2">応募者一覧</a>
-                    <a href="company/edit/<?php echo $job['id'] ?>" class="btn btn-dark mt-2">編集する</a>
+                    <h5 class="card-title"><?php echo e($job['title']) ?></h5>
+                    <p class="card-text my-0">仕事内容：<?php echo e($job['description']) ?></p>
+                    <p class="card-text my-0">応募条件：<?php echo e($job['requirements']) ?></p>
+                    <p class="card-text my-0">期間：<?php echo e($job['period']) ?></p>
+                    <p class="card-text my-0">給与・報酬：<?php echo e($job['salary']) ?></p>
+                    <a href="/company/applicants/<?php echo e($job['id']); ?>" class="btn btn-light mt-2">応募者一覧</a>
+                    <a href="/company/edit/<?php echo e($job['id']) ?>" class="btn btn-dark mt-2">編集する</a>
                 </div>
             </div>
         </div>

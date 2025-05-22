@@ -7,19 +7,26 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
     class LikeViewModel {
         constructor() {
             this.isLiked = ko.observable(initialLiked);
+            this.isLoading = ko.observable(false);
         }
 
         toggleLike = () => {
+            if (this.isLoading()) return;
+
             const liked = this.isLiked();
+            this.isLoading(true);
 
             fetch('/student/like', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    ...(csrfToken && { 'X-CSRF-Token': csrfToken })
                 },
                 body: JSON.stringify({
                     job_id: jobId,
@@ -36,15 +43,17 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('通信エラー:', error);
+                alert('通信エラーが発生しました。');
+            })
+            .finally(() => {
+                this.isLoading(false);
             });
         }
     }
 
-    // Knockout.js バインド適用
     const likeButtonArea = document.getElementById('like-button-area');
     if (likeButtonArea) {
         const vm = new LikeViewModel();
         ko.applyBindings(vm, likeButtonArea);
     }
 });
-
