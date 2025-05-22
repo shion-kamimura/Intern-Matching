@@ -4,7 +4,10 @@
     <?php if (!empty($error)): ?>
         <div class="alert alert-danger"><?= $error ?></div>
     <?php endif; ?>
-    <div class="container m-5 p-5">
+    <div class="container mt-5 mb-1 pt-5 px-1">
+        <h1 class="h3">学生ログイン</h1>
+    </div>
+    <div class="container mx-5 px-5 mt-5">
         <form method="post" action="/student/login">
             <div class="mb-3">
                 <label for="email" class="form-label">メールアドレス</label>

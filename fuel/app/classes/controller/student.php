@@ -81,7 +81,7 @@ class Controller_Student extends Controller_Base
 
     public function action_list()
     {
-        $jobs = DB::select(
+        /* $jobs = DB::select(
             'jobs.id', 'jobs.title', 'jobs.description', 'jobs.period',
             'jobs.salary', 'jobs.requirements', 'jobs.created_at',
             'companies.name'
@@ -91,8 +91,8 @@ class Controller_Student extends Controller_Base
             ->on('jobs.company_id', '=', 'companies.id')
             ->order_by('jobs.created_at', 'desc')
             ->execute()
-            ->as_array();
-        return Response::forge(view::forge('student/list', ['jobs' => $jobs]));
+            ->as_array(); */
+        return Response::forge(view::forge('student/list'));//, ['jobs' => $jobs]));
     }
 
     public function action_detail($id)
@@ -108,7 +108,18 @@ class Controller_Student extends Controller_Base
             ->where('jobs.id', '=', $id)
             ->execute()
             ->current();
-        return Response::forge(View::forge('student/detail', ['job' => $job]));
+
+        $job_id = $job['id'];
+        $user_id = Session::get('user_id');
+
+        $is_liked = DB::select()
+            ->from('likes')
+            ->where('user_id', $user_id)
+            ->where('job_id', $job_id)
+            ->execute()
+            ->count() > 0;
+
+        return Response::forge(View::forge('student/detail', ['job' => $job, 'is_liked' => $is_liked, 'job_id' => $job_id]));
     }
 
     public function action_apply()
@@ -123,7 +134,7 @@ class Controller_Student extends Controller_Base
             ->execute()
             ->count();
 
-        if ($exists > 0) {
+        if ($exists > 0) {                                                                                                                                                                                                                                                                                                                                                                   
             Session::set_flash('error', 'すでにこの求人に応募しています。');
             return Response::redirect("/student/detail/{$job_id}");
         }
@@ -137,4 +148,37 @@ class Controller_Student extends Controller_Base
         Session::set_flash('success', '応募が完了しました！');
         return Response::redirect("/student/detail/{$job_id}");
     }
+
+    public function action_like()
+    {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $user_id = Session::get('user_id');
+        $job_id = $data['job_id'];
+        $action = $data['action'];
+        $liked = $action === 'like';
+
+        if (!$user_id || !$job_id) {
+            return Response::forge(json_encode(['success' => false]), 400, ['Content-Type' => 'application/json']);
+        }
+
+        if ($liked) {
+            // いいねを追加
+            DB::insert('likes')->set([
+                'user_id' => $user_id,
+                'job_id' => $job_id,
+                'created_at' => date('Y-m-d H:i:s')
+            ])->execute();
+        } else {
+            // いいねを削除
+            DB::delete('likes')
+                ->where('user_id', $user_id)
+                ->where('job_id', $job_id)
+                ->execute();
+        }
+
+        return Response::forge(json_encode(['success' => true]), 200, ['Content-Type' => 'application/json']);
+    }
+
+
 }

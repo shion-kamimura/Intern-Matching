@@ -137,4 +137,20 @@ class Controller_Company extends Controller_Base
         return Response::forge(View::forge('company/edit', ['job' => $job]));
     }
 
+    public function action_applicants($job_id)
+    {
+        $company_id = Session::get('company_id');
+
+        $applicants = DB::select('users.id', 'users.name', 'users.email', 'users.school', 'users.grade', 'users.skills', 'applications.created_at')
+        ->from('applications')
+        ->join('users', 'INNER')->on('applications.user_id', '=', 'users.id')
+        ->join('jobs', 'INNER')->on('applications.job_id', '=', 'jobs.id')
+        ->where('applications.job_id', $job_id)
+        ->and_where('jobs.company_id', $company_id) // 自社の募集か確認
+        ->execute()
+        ->as_array();
+
+        return View::forge('company/applicants', ['applicants' => $applicants]);
+    }
+
 }

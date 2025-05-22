@@ -1,0 +1,50 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const jobId = document.getElementById('job_id')?.value;
+    const initialLiked = window.initialLiked === true;
+
+    if (!jobId) {
+        console.error('job_id が見つかりませんでした。');
+        return;
+    }
+
+    class LikeViewModel {
+        constructor() {
+            this.isLiked = ko.observable(initialLiked);
+        }
+
+        toggleLike = () => {
+            const liked = this.isLiked();
+
+            fetch('/student/like', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    job_id: jobId,
+                    action: liked ? 'unlike' : 'like'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.isLiked(!liked);
+                } else {
+                    alert('操作に失敗しました。');
+                }
+            })
+            .catch(error => {
+                console.error('通信エラー:', error);
+            });
+        }
+    }
+
+    // Knockout.js バインド適用
+    const likeButtonArea = document.getElementById('like-button-area');
+    if (likeButtonArea) {
+        const vm = new LikeViewModel();
+        ko.applyBindings(vm, likeButtonArea);
+    }
+});
+

@@ -9,38 +9,34 @@
                     フィルター
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Action</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="viewModel.sortJobs('created_at')">新着順</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="viewModel.sortJobs('likes')">いいね数が多い順</a></li>
                 </ul>
             </div>
         </div>
     </div>
-    <?php foreach ($jobs as $job): ?>
+
+    <div data-bind="foreach: jobs">
         <div class="container mb-5">
             <div class="card">
-                <h4 class="card-header bg-white">
-                    <?php echo $job['name'] ?>
-                </h4>
+                <h4 class="card-header bg-white" data-bind="text: company_name"></h4>
                 <div class="card-body">
-                    <h5 class="card-title"><?php echo $job['title'] ?></h5>
-                    <p class="card-text my-0">仕事内容：<?php echo $job['description'] ?></p>
-                    <p class="card-text my-0">応募条件：<?php echo $job['requirements'] ?></p>
-                    <p class="card-text my-0">期間：<?php echo $job['period'] ?></p>
-                    <p class="card-text my-0">給与・報酬：<?php echo $job['salary'] ?></p>
+                    <h5 class="card-title" data-bind="text: title"></h5>
+                    <p class="card-text my-0">仕事内容：<span data-bind="text: description"></span></p>
+                    <p class="card-text my-0">応募条件：<span data-bind="text: requirements"></span></p>
+                    <p class="card-text my-0">期間：<span data-bind="text: period"></span></p>
+                    <p class="card-text my-0">給与・報酬：<span data-bind="text: salary"></span></p>
                     <div class="d-flex justify-content-between">
-                        <a href="/student/detail/<?php echo $job['id'] ?>" class="btn btn-light border mt-2">詳細を見る</a>
-                        <form method="post" action="/student/apply">
-                            <input type="hidden" name="job_id" value="<?php echo $job['id'] ?>">
-                            <button type="submit" class="btn btn-dark mt-2">応募する</a>
-                        </from>
+                        <a data-bind="attr: { href: '/student/detail/' + id }" class="btn btn-light border mt-2">詳細を見る</a>
                     </div>
                 </div>
             </div>
         </div>
-    <?php endforeach ?>
-    
+    </div>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.js"></script>
+<script src="/assets/js/jobs.js"></script>
 </body>
 </html>

@@ -19,6 +19,7 @@
                     <p class="card-text my-0">応募条件：<?php echo $job['requirements'] ?></p>
                     <p class="card-text my-0">期間：<?php echo $job['period'] ?></p>
                     <p class="card-text my-0">給与・報酬：<?php echo $job['salary'] ?></p>
+                    <a href="/company/applicants/<?php echo $job['id']; ?>" class="btn btn-light mt-2">応募者一覧</a>
                     <a href="company/edit/<?php echo $job['id'] ?>" class="btn btn-dark mt-2">編集する</a>
                 </div>
             </div>
