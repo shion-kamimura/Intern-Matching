@@ -18,7 +18,6 @@ class Controller_Company extends Controller_Base
                 $company = DB::select()
                     ->from('companies')
                     ->where('email', $email)
-                    ->where('password', $password)
                     ->execute()
                     ->current();
 
@@ -54,10 +53,11 @@ class Controller_Company extends Controller_Base
     public function post_register()
     {
         $val = Validation::forge();
-        $val->add('name', '会社名')->add_rule('required')->add_rule('max_length', 100);
-        $val->add('email', 'メールアドレス')->add_rule('required')->add_rule('valid_email');
+        $val->add_callable(new MyRules());
+        $val->add('name', '企業名')->add_rule('required')->add_rule('max_length', 100);
+        $val->add('email', 'メールアドレス')->add_rule('required')->add_rule('valid_email')->add_rule('unique_company');
         $val->add('password', 'パスワード')->add_rule('required')->add_rule('min_length', 6);
-        $val->add('description', '説明')->add_rule('required')->add_rule('max_length', 255);
+        $val->add('description', '企業情報')->add_rule('required')->add_rule('max_length', 255);
         
         if (!$val->run()) {
             $errors = $val->error();
@@ -74,7 +74,7 @@ class Controller_Company extends Controller_Base
         DB::insert('companies')->set([
             'name' => $name,
             'email' => $email,
-            'password' => $password,
+            'password' => $password_hashed,
             'description' => $description,
             'created_at' => Date::time()->format('mysql'),
         ])->execute();
@@ -112,11 +112,11 @@ class Controller_Company extends Controller_Base
         }
 
         $val = Validation::forge();
-        $val->add('title')->add_rule('required');
-        $val->add('description')->add_rule('required');
-        $val->add('period')->add_rule('required');
-        $val->add('salary')->add_rule('required');
-        $val->add('requirements')->add_rule('required');
+        $val->add('title', 'タイトル')->add_rule('required');
+        $val->add('description', '仕事内容')->add_rule('required');
+        $val->add('period', '期間')->add_rule('required');
+        $val->add('salary', '給与・報酬')->add_rule('required');
+        $val->add('requirements', '応募条件')->add_rule('required');
 
         if (!$val->run()) {
             return Response::forge(View::forge('company/create', ['errors' => $val->error()]));
@@ -155,11 +155,11 @@ class Controller_Company extends Controller_Base
 
         if (Input::method() === 'POST') {
             $val = Validation::forge();
-            $val->add('title')->add_rule('required');
-            $val->add('description')->add_rule('required');
-            $val->add('period')->add_rule('required');
-            $val->add('salary')->add_rule('required');
-            $val->add('requirements')->add_rule('required');
+            $val->add('title', 'タイトル')->add_rule('required');
+            $val->add('description', '仕事内容')->add_rule('required');
+            $val->add('period', '期間')->add_rule('required');
+            $val->add('salary', '給与・報酬')->add_rule('required');
+            $val->add('requirements', '応募条件')->add_rule('required');
 
             if ($val->run()) {
                 $title = Input::post('title');
@@ -181,6 +181,7 @@ class Controller_Company extends Controller_Base
             } else {
                 return Response::forge(View::forge('company/edit', ['job' => $job, 'errors' => $val->error()]));
             }
+        }
 
         return Response::forge(View::forge('company/edit', ['job' => $job]));
     }

@@ -77,9 +77,9 @@ return array(
 	/**
 	 * Localization & internationalization settings
 	 */
-	// 'language'           => 'en', // Default language
-	// 'language_fallback'  => 'en', // Fallback language when file isn't available for default language
-	// 'locale'             => 'en_US', // PHP set_locale() setting, null to not set
+	'language'           => 'ja', // Default language
+	'language_fallback'  => 'ja', // Fallback language when file isn't available for default language
+	'locale'             => 'ja_JP.UTF-8', // PHP set_locale() setting, null to not set
 
 	/**
 	 * Internal string encoding charset
@@ -113,12 +113,12 @@ return array(
 	 * Security settings
 	 */
 	'security' => array(
-		'csrf_autoload'            => true,
-		'csrf_autoload_methods'    => array('post', 'put', 'delete'),
-		'csrf_bad_request_on_fail' => true,
-		'csrf_auto_token'          => true,
-		'csrf_token_key'           => 'fuel_csrf_token',
-		'csrf_expiration'          => 0,
+		// 'csrf_autoload'            => false,
+		// 'csrf_autoload_methods'    => array('post', 'put', 'delete'),
+		// 'csrf_bad_request_on_fail' => false,
+		// 'csrf_auto_token'          => false,
+		// 'csrf_token_key'           => 'fuel_csrf_token',
+		// 'csrf_expiration'          => 0,
 
 		/**
 		 * A salt to make sure the generated security tokens are not predictable

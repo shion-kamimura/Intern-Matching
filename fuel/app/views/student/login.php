@@ -17,7 +17,7 @@
             <button type="submit" class="btn btn-dark">ログイン</button>
         </form>
         <?php if (!empty($error)): ?>
-            <div class="alert alert-danger mt-3"><?php e($error) ?></div>
+            <div class="alert alert-danger mt-3"><?php echo e($error) ?></div>
         <?php endif; ?>
     </div>
     

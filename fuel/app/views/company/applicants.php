@@ -3,6 +3,11 @@
     <div class="container mt-5 mb-5 pt-5">
         <h1 class="h3">応募者一覧</h1>
     </div>
+    <?php if (empty($applicants)): ?>
+        <div class="container">
+            <p class="text-muted">まだ応募者がいません。</p>
+        </div>
+    <?php endif; ?>
     <?php foreach ($applicants as $applicant): ?>
         <div class="container mb-5">
             <div class="card">

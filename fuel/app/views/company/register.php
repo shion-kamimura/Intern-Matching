@@ -21,9 +21,15 @@
             </div>
             <button type="submit" class="btn btn-dark">登録</button>
         </form>
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger mt-3"><?= e($error) ?></div>
-        <?php endif; ?>
+        <?php if (!empty($errors['name'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['name']) ?></div>
+        <?php elseif (!empty($errors['email'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['email']) ?></div>
+        <?php elseif (!empty($errors['password'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['password']) ?></div>
+        <?php elseif (!empty($errors['description'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['description']) ?></div>
+        <?php endif ?>
     </div>
 </main>
 </body>

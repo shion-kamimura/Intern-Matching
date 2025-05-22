@@ -29,9 +29,19 @@
             </div>
             <button type="submit" class="btn btn-dark">登録</button>
         </form>
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger mt-3"><?= e($error) ?></div>
-        <?php endif; ?>
+        <?php if (!empty($errors['name'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['name']) ?></div>
+        <?php elseif (!empty($errors['email'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['email']) ?></div>
+        <?php elseif (!empty($errors['password'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['password']) ?></div>
+        <?php elseif (!empty($errors['school'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['school']) ?></div>
+        <?php elseif (!empty($errors['grade'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['grade']) ?></div>
+        <?php elseif (!empty($errors['skills'])): ?>
+            <div class="alert alert-danger mt-3"><?php echo e($errors['skills']) ?></div>
+        <?php endif ?>
     </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>

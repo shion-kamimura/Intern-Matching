@@ -17,7 +17,6 @@ class Controller_Student extends Controller_Base
                 $user = DB::select()
                     ->from('users')
                     ->where('email', $email)
-                    ->where('password', $password)
                     ->execute()
                     ->current();
 
@@ -54,8 +53,9 @@ class Controller_Student extends Controller_Base
     public function post_register()
     {
         $val = Validation::forge();
+        $val->add_callable(new MyRules());
         $val->add('name', '名前')->add_rule('required')->add_rule('max_length', 100);
-        $val->add('email', 'メールアドレス')->add_rule('required')->add_rule('valid_email');
+        $val->add('email', 'メールアドレス')->add_rule('required')->add_rule('valid_email')->add_rule('unique_user');
         $val->add('password', 'パスワード')->add_rule('required')->add_rule('min_length', 6);
         $val->add('school', '学校')->add_rule('required')->add_rule('max_length', 100);
         $val->add('grade', '学年')->add_rule('required');
@@ -78,7 +78,7 @@ class Controller_Student extends Controller_Base
         DB::insert('users')->set([
             'name' => $name,
             'email' => $email,
-            'password' => $password,
+            'password' => $password_hashed,
             'school' => $school,
             'grade' => $grade,
             'skills' => $skills,
