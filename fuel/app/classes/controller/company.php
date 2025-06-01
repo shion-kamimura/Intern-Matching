@@ -15,11 +15,7 @@ class Controller_Company extends Controller_Base
             $val->add('password', 'Password')->add_rule('required');
 
             if ($val->run()) {
-                $company = DB::select()
-                    ->from('companies')
-                    ->where('email', $email)
-                    ->execute()
-                    ->current();
+                $company = Model_Company::find_by_email($email);
 
                 if ($company && password_verify($password, $company['password'])) {
                     Session::set('company_id', $company['id']);
@@ -64,20 +60,13 @@ class Controller_Company extends Controller_Base
             return Response::forge(View::forge('company/register', ['errors' => $errors]));
         }
         
-        $name = Input::post('name');
-        $email = Input::post('email');
-        $password = Input::post('password');
-        $description = Input::post('description');
-
-        $password_hashed = password_hash($password, PASSWORD_DEFAULT);
-
-        DB::insert('companies')->set([
-            'name' => $name,
-            'email' => $email,
-            'password' => $password_hashed,
-            'description' => $description,
+        Model_Company::create([
+            'name' => Input::post('name'),
+            'email' => Input::post('email'),
+            'password' => password_hash(Input::post('password'), PASSWORD_DEFAULT),
+            'description' => Input::post('description'),
             'created_at' => Date::time()->format('mysql'),
-        ])->execute();
+        ]);
 
         Response::redirect('company/login');
     }
@@ -122,21 +111,14 @@ class Controller_Company extends Controller_Base
             return Response::forge(View::forge('company/create', ['errors' => $val->error()]));
         }
 
-        $title = Input::post('title');
-        $description = Input::post('description');
-        $period = Input::post('period');
-        $salary = Input::post('salary');
-        $requirements = Input::post('requirements');
-
-        DB::insert('jobs')->set([
+        Model_Job::create([
             'company_id' => $company_id,
-            'title' => $title,
-            'description' => $description,
-            'period' => $period,
-            'salary' => $salary,
-            'requirements' => $requirements,
-            'created_at' => Date::time()->format('mysql'),
-        ])->execute();
+            'title' => Input::post('title'),
+            'description' => Input::post('description'),
+            'period' => Input::post('period'),
+            'salary' => Input::post('salary'),
+            'requirements' => Input::post('requirements'),
+        ]);
 
         Response::redirect('company/dashboard');
     }
@@ -145,13 +127,15 @@ class Controller_Company extends Controller_Base
     {
         if (!$id) return Response::redirect('/company/dashboard');
 
-        $job = DB::select()
-            ->from('jobs')
-            ->where('id', $id)
-            ->execute()
-            ->current();
+        $job = Model_Job::find_by_id($id);
 
         if (!$job) return Response::redirect('/company/dashboard');
+
+        $company_id = Session::get('company_id'); 
+        if ($job['company_id'] != $company_id) {
+            Session::set_flash('error', 'この募集情報を編集する権限がありません');
+            return Response::redirect('/company/dashboard');
+        }
 
         if (Input::method() === 'POST') {
             $val = Validation::forge();
@@ -162,19 +146,13 @@ class Controller_Company extends Controller_Base
             $val->add('requirements', '応募条件')->add_rule('required');
 
             if ($val->run()) {
-                $title = Input::post('title');
-                $description = Input::post('description');
-                $period = Input::post('period');
-                $salary = Input::post('salary');
-                $requirements = Input::post('requirements');
-
-                DB::update('jobs')->set([
-                    'title' => $title,
-                    'description' => $description,
-                    'period' => $period,
-                    'salary' => $salary,
-                    'requirements' => $requirements,
-                ])->where('id', $id)->execute();
+                Model_Job::update($id, [
+                    'title' => Input::post('title'),
+                    'description' => Input::post('description'),
+                    'period' => Input::post('period'),
+                    'salary' => Input::post('salary'),
+                    'requirements' => Input::post('requirements'),
+                ]);
 
                 Session::set_flash('success', '募集情報を更新しました');
                 return Response::redirect('/company/dashboard');
@@ -191,14 +169,7 @@ class Controller_Company extends Controller_Base
         $company_id = Session::get('company_id');
         if (!$company_id) return Response::redirect('company/login');
 
-        $applicants = DB::select('users.id', 'users.name', 'users.email', 'users.school', 'users.grade', 'users.skills', 'applications.created_at')
-            ->from('applications')
-            ->join('users', 'INNER')->on('applications.user_id', '=', 'users.id')
-            ->join('jobs', 'INNER')->on('applications.job_id', '=', 'jobs.id')
-            ->where('applications.job_id', $job_id)
-            ->and_where('jobs.company_id', $company_id) // 自社の募集か確認
-            ->execute()
-            ->as_array();
+        $applicants = Model_Application::get_applicants($job_id, $company_id);
 
         return View::forge('company/applicants', ['applicants' => $applicants]);
     }

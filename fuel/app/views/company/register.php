@@ -2,25 +2,24 @@
 
 <main>
     <div class="container m-5 p-5">
-        <form method="post" action="/company/register">
+        <?= Form::open(['action' => '/company/register', 'method' => 'post']) ?>
             <div class="mb-3">
-                <label for="name" class="form-label">企業名</label>
-                <input type="text" class="form-control" id="name" name="name">
+                <?= Form::label('企業名', 'name', ['class' => 'form-label']) ?>
+                <?= Form::input('name', Input::post('name'), ['class' => 'form-control', 'id' => 'name']) ?>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">メールアドレス</label>
-                <input type="email" class="form-control" id="email" name="email">
+                <?= Form::label('メールアドレス', 'email', ['class' => 'form-label']) ?>
+                <?= Form::input('email', Input::post('email'), ['class' => 'form-control', 'id' => 'email', 'type' => 'email']) ?>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">パスワード</label>
-                <input type="password" class="form-control" id="password" name="password">
+                <?= Form::label('パスワード', 'password', ['class' => 'form-label']) ?>
+                <?= Form::password('password', null, ['class' => 'form-control', 'id' => 'password']) ?>
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label">企業情報</label>
-                <input type="text" class="form-control" id="description" name="description">
-            </div>
-            <button type="submit" class="btn btn-dark">登録</button>
-        </form>
+                <?= Form::label('企業情報', 'description', ['class' => 'form-label']) ?>
+                <?= Form::input('description', Input::post('description'), ['class' => 'form-control', 'id' => 'description']) ?>
+            <?= Form::submit('submit', '登録', ['class' => 'btn btn-dark']) ?>
+        <?= Form::close() ?>
         <?php if (!empty($errors['name'])): ?>
             <div class="alert alert-danger mt-3"><?php echo e($errors['name']) ?></div>
         <?php elseif (!empty($errors['email'])): ?>

@@ -14,11 +14,7 @@ class Controller_Student extends Controller_Base
             $val->add('password', 'Password')->add_rule('required');
 
             if($val->run()) {
-                $user = DB::select()
-                    ->from('users')
-                    ->where('email', $email)
-                    ->execute()
-                    ->current();
+                $user = Model_User::find_by_email($email);
 
                 if ($user && password_verify($password, $user['password'])) {
                     Session::set('user_id', $user['id']);
@@ -66,56 +62,41 @@ class Controller_Student extends Controller_Base
             return Response::forge(View::forge('student/register', ['errors' => $errors]));
         }
 
-        $name = Input::post('name');
-        $email = Input::post('email');
-        $password = Input::post('password');
-        $school = Input::post('school');
-        $grade = Input::post('grade');
-        $skills = Input::post('skills');
-
-        $password_hashed = password_hash($password, PASSWORD_DEFAULT);
-
-        DB::insert('users')->set([
-            'name' => $name,
-            'email' => $email,
-            'password' => $password_hashed,
-            'school' => $school,
-            'grade' => $grade,
-            'skills' => $skills,
+        $user_data = [
+            'name' => Input::post('name'),
+            'email' => Input::post('email'),
+            'password' => password_hash(Input::post('password'), PASSWORD_DEFAULT),
+            'school' => Input::post('school'),
+            'grade' => Input::post('grade'),
+            'skills' => Input::post('skills'),
             'created_at' => Date::time()->format('mysql'),
-        ])->execute();
+        ];
+        Model_User::create($user_data);
 
         Response::redirect('student/login');
     }
 
     public function action_list()
     {
-        return Response::forge(view::forge('student/list'));//, ['jobs' => $jobs]));
+        $user_id = Session::get('user_id');
+        if (!$user_id) return Response::redirect('student/login');
+
+        return Response::forge(View::forge('student/list'));
     }
 
     public function action_detail($id)
     {
-        $job = DB::select(
-            'jobs.id', 'jobs.title', 'jobs.description', 'jobs.period',
-            'jobs.salary', 'jobs.requirements', 'jobs.created_at',
-            'companies.name'
-        )
-            ->from('jobs')
-            ->join('companies', 'LEFT')
-            ->on('jobs.company_id', '=', 'companies.id')
-            ->where('jobs.id', '=', $id)
-            ->execute()
-            ->current();
+        if (!$id) return Response::redirect('/student/list');
+
+        $job = Model_Job::find_with_company($id);
+        if (!$job) return Response::redirect('/student/list');
 
         $job_id = $job['id'];
+
+
         $user_id = Session::get('user_id');
 
-        $is_liked = DB::select()
-            ->from('likes')
-            ->where('user_id', $user_id)
-            ->where('job_id', $job_id)
-            ->execute()
-            ->count() > 0;
+        $is_liked = Model_Like::is_liked($user_id, $id);
 
         return Response::forge(View::forge('student/detail', ['job' => $job, 'is_liked' => $is_liked, 'job_id' => $job_id]));
     }
@@ -125,25 +106,12 @@ class Controller_Student extends Controller_Base
         $user_id = Session::get('user_id');
         $job_id = Input::post('job_id');
 
-        $exists = DB::select()
-            ->from('applications')
-            ->where('user_id', $user_id)
-            ->and_where('job_id', $job_id)
-            ->execute()
-            ->count();
-
-        if ($exists > 0) {                                                                                                                                                                                                                                                                                                                                                                   
+        if (Model_Application::exists($user_id, $job_id)) {
             Session::set_flash('error', 'すでにこの求人に応募しています。');
-            return Response::redirect("/student/detail/{$job_id}");
+        } else {
+            Model_Application::apply($user_id, $job_id);
+            Session::set_flash('success', '応募が完了しました！');
         }
-
-        DB::insert('applications')->set([
-            'user_id' => $user_id,
-            'job_id' => $job_id,
-            'created_at' => Date::time()->format('mysql'),
-        ])->execute();
-
-        Session::set_flash('success', '応募が完了しました！');
         return Response::redirect("/student/detail/{$job_id}");
     }
 
@@ -161,16 +129,9 @@ class Controller_Student extends Controller_Base
         }
 
         if ($liked) {
-            DB::insert('likes')->set([
-                'user_id' => $user_id,
-                'job_id' => $job_id,
-                'created_at' => date('Y-m-d H:i:s')
-            ])->execute();
+            Model_Like::like($user_id, $job_id);
         } else {
-            DB::delete('likes')
-                ->where('user_id', $user_id)
-                ->where('job_id', $job_id)
-                ->execute();
+            Model_Like::unlike($user_id, $job_id);
         }
 
         return Response::forge(json_encode(['success' => true]), 200, ['Content-Type' => 'application/json']);

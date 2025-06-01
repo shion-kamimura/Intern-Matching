@@ -2,34 +2,34 @@
 
 <main>
     <div class="container p-5 mt-5">
-        <form method="post">
+        <?= Form::open(['method' => 'post']) ?>
             <div class="mb-3">
-                <label class="form-label">タイトル</label>
-                <input type="text" name="title" class="form-control" value="<?php echo e($job['title']) ?>">
+                <?= Form::label('タイトル', 'title', ['class' => 'form-label']) ?>
+                <?= Form::input('title', Input::post('title', $job['title']), ['class' => 'form-control']) ?>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">仕事内容</label>
-                <textarea name="description" class="form-control"><?php echo e($job['description']) ?></textarea>
+                <?= Form::label('仕事内容', 'description', ['class' => 'form-label']) ?>
+                <?= Form::textarea('description', Input::post('description', $job['description']), ['class' => 'form-control']) ?>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">期間</label>
-                <input type="text" name="period" class="form-control" value="<?php echo e($job['period']) ?>">
+                <?= Form::label('期間', 'period', ['class' => 'form-label']) ?>
+                <?= Form::input('period', Input::post('period', $job['period']), ['class' => 'form-control']) ?>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">給与・報酬</label>
-                <input type="text" name="salary" class="form-control" value="<?php echo e($job['salary']) ?>">
+                <?= Form::label('給与・報酬', 'salary', ['class' => 'form-label']) ?>
+                <?= Form::input('salary', Input::post('salary', $job['salary']), ['class' => 'form-control']) ?>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">応募条件</label>
-                <textarea name="requirements" class="form-control"><?php echo e($job['requirements']) ?></textarea>
+                <?= Form::label('応募条件', 'requirements', ['class' => 'form-label']) ?>
+                <?= Form::textarea('requirements', Input::post('requirements', $job['requirements']), ['class' => 'form-control']) ?>
             </div>
 
-            <button type="submit" class="btn btn-dark">更新</button>
-        </form>
+            <?= Form::submit('submit', '更新', ['class' => 'btn btn-dark']) ?>
+        <?= Form::close() ?>
         <?php if (!empty($errors['title'])): ?>
             <div class="alert alert-danger mt-3"><?php echo e($errors['title']) ?></div>
         <?php elseif (!empty($errors['description'])): ?>

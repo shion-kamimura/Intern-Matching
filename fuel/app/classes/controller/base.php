@@ -11,7 +11,7 @@ class Controller_Base extends Controller
         View::set_global('user_type', "");
         
         if($user_id = Session::get('user_id')) {
-            $user = DB::select()->from('users')->where('id', $user_id)->execute()->current();
+            $user = Model_User::find_by_id($user_id);
             if($user) {
                 View::set_global('is_logged_in', true);
                 View::set_global('user_name', $user['name']);
@@ -20,7 +20,7 @@ class Controller_Base extends Controller
         }
 
         if ($company_id = Session::get('company_id')) {
-            $company = DB::select()->from('companies')->where('id', $company_id)->execute()->current();
+            $company = Model_Company::find_by_id($company_id);
             if ($company) {
                 View::set_global('is_logged_in', true);
                 View::set_global('user_name', $company['name']);

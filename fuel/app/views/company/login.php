@@ -5,17 +5,17 @@
         <h1 class="h3">企業ログイン</h1>
     </div>
     <div class="container px-5 mt-5">
-        <form method="post" action="/company/login">
+        <?= Form::open(['action' => '/company/login', 'method' => 'post']) ?>
             <div class="mb-3">
-                <label for="email" class="form-label">メールアドレス</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <?= Form::label('メールアドレス', 'email', ['class' => 'form-label']) ?>
+                <?= Form::input('email', Input::post('email'), ['type' => 'email', 'class' => 'form-control', 'id' => 'email', 'required']) ?>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">パスワード</label>
-                <input type="password" class="form-control" id="password" name="password">
+                <?= Form::label('パスワード', 'password', ['class' => 'form-label']) ?>
+                <?= Form::password('password', null, ['class' => 'form-control', 'id' => 'password']) ?>
             </div>
-            <button type="submit" class="btn btn-dark">ログイン</button>
-        </form>
+            <?= Form::submit('submit', 'ログイン', ['class' => 'btn btn-dark']) ?>
+        <?= Form::close() ?>
         <?php if (!empty($error)): ?>
             <div class="alert alert-danger mt-3"><?php echo e($error) ?></div>
         <?php endif; ?>

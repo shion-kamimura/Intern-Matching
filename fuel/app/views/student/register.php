@@ -2,33 +2,33 @@
 
 <main>
     <div class="container m-5 p-5">
-        <form method="post" action="/student/register">
+        <?= Form::open(['action' => '/student/register', 'method' => 'post']) ?>
             <div class="mb-3">
-                <label for="name" class="form-label">名前</label>
-                <input type="text" class="form-control" id="name" name="name">
+                <?= Form::label('名前', 'name', ['class' => 'form-label']) ?>
+                <?= Form::input('name', Input::post('name'), ['class' => 'form-control', 'id' => 'name']) ?>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">メールアドレス</label>
-                <input type="email" class="form-control" id="email" name="email">
+                <?= Form::label('メールアドレス', 'email', ['class' => 'form-label']) ?>
+                <?= Form::input('email', Input::post('email'), ['type' => 'email', 'class' => 'form-control', 'id' => 'email']) ?>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">パスワード</label>
-                <input type="password" class="form-control" id="password" name="password">
+                <?= Form::label('パスワード', 'password', ['class' => 'form-label']) ?>
+                <?= Form::password('password', null, ['class' => 'form-control', 'id' => 'password']) ?>
             </div>
             <div class="mb-3">
-                <label for="school" class="form-label">学校名</label>
-                <input type="text" class="form-control" id="school" name="school">
+                <?= Form::label('学校名', 'school', ['class' => 'form-label']) ?>
+                <?= Form::input('school', Input::post('school'), ['class' => 'form-control', 'id' => 'school']) ?>
             </div>
             <div class="mb-3">
-                <label for="grade" class="form-label">学年</label>
-                <input type="text" class="form-control" id="grade" name="grade">
+                <?= Form::label('学年', 'grade', ['class' => 'form-label']) ?>
+                <?= Form::input('grade', Input::post('grade'), ['class' => 'form-control', 'id' => 'grade']) ?>
             </div>
             <div class="mb-3">
-                <label for="skills" class="form-label">スキル</label>
-                <input type="text" class="form-control" id="skills" name="skills">
+                <?= Form::label('スキル', 'skills', ['class' => 'form-label']) ?>
+                <?= Form::input('skills', Input::post('skills'), ['class' => 'form-control', 'id' => 'skills']) ?>
             </div>
-            <button type="submit" class="btn btn-dark">登録</button>
-        </form>
+            <?= Form::submit('submit', '登録', ['class' => 'btn btn-dark']) ?>
+        <?= Form::close() ?>
         <?php if (!empty($errors['name'])): ?>
             <div class="alert alert-danger mt-3"><?php echo e($errors['name']) ?></div>
         <?php elseif (!empty($errors['email'])): ?>
